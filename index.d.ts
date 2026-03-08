@@ -1,19 +1,6 @@
-export = plugin;
-/** @typedef {{ plugins: { react: typeof plugin }, rules: import('eslint').Linter.RulesRecord, languageOptions: { parserOptions: import('eslint').Linter.ParserOptions } }} ReactFlatConfig */
-/** @type {{ deprecatedRules: typeof deprecatedRules, rules: typeof allRules, configs: typeof configs & { flat: Record<string, ReactFlatConfig> }}} */
-declare const plugin: {
-    deprecatedRules: typeof deprecatedRules;
-    rules: typeof allRules;
-    configs: typeof configs & {
-        flat: Record<string, ReactFlatConfig>;
-    };
-};
-declare namespace plugin {
-    export { ReactFlatConfig };
-}
-/** @type {Partial<typeof allRules>} */
-declare const deprecatedRules: Partial<typeof allRules>;
-declare const allRules: {
+export = rules;
+/** @satisfies {Record<string, import('eslint').Rule.RuleModule>} */
+declare const rules: {
     'boolean-prop-naming': import("eslint").Rule.RuleModule;
     'button-has-type': import("eslint").Rule.RuleModule;
     'checked-requires-onchange-or-readonly': import("eslint").Rule.RuleModule;
@@ -117,71 +104,5 @@ declare const allRules: {
     'static-property-placement': import("eslint").Rule.RuleModule;
     'style-prop-object': import("eslint").Rule.RuleModule;
     'void-dom-elements-no-children': import("eslint").Rule.RuleModule;
-};
-declare const configs: {
-    recommended: {
-        plugins: ["react"];
-        parserOptions: {
-            ecmaFeatures: {
-                jsx: boolean;
-            };
-        };
-        rules: {
-            'react/display-name': 2;
-            'react/jsx-key': 2;
-            'react/jsx-no-comment-textnodes': 2;
-            'react/jsx-no-duplicate-props': 2;
-            'react/jsx-no-target-blank': 2;
-            'react/jsx-no-undef': 2;
-            'react/jsx-uses-react': 2;
-            'react/jsx-uses-vars': 2;
-            'react/no-children-prop': 2;
-            'react/no-danger-with-children': 2;
-            'react/no-deprecated': 2;
-            'react/no-direct-mutation-state': 2;
-            'react/no-find-dom-node': 2;
-            'react/no-is-mounted': 2;
-            'react/no-render-return-value': 2;
-            'react/no-string-refs': 2;
-            'react/no-unescaped-entities': 2;
-            'react/no-unknown-property': 2;
-            'react/no-unsafe': 0;
-            'react/prop-types': 2;
-            'react/react-in-jsx-scope': 2;
-            'react/require-render-return': 2;
-        };
-    };
-    all: {
-        plugins: ["react"];
-        parserOptions: {
-            ecmaFeatures: {
-                jsx: boolean;
-            };
-        };
-        rules: Record<"boolean-prop-naming" | "button-has-type" | "checked-requires-onchange-or-readonly" | "default-props-match-prop-types" | "destructuring-assignment" | "display-name" | "forbid-component-props" | "forbid-dom-props" | "forbid-elements" | "forbid-foreign-prop-types" | "forbid-prop-types" | "prop-types" | "forward-ref-uses-ref" | "function-component-definition" | "hook-use-state" | "iframe-missing-sandbox" | "jsx-boolean-value" | "jsx-child-element-spacing" | "jsx-closing-bracket-location" | "jsx-closing-tag-location" | "jsx-curly-spacing" | "jsx-curly-newline" | "jsx-equals-spacing" | "jsx-filename-extension" | "jsx-first-prop-new-line" | "jsx-handler-names" | "jsx-indent" | "jsx-indent-props" | "jsx-key" | "jsx-max-depth" | "jsx-max-props-per-line" | "jsx-newline" | "jsx-no-bind" | "jsx-no-comment-textnodes" | "jsx-no-constructed-context-values" | "jsx-no-duplicate-props" | "jsx-no-leaked-render" | "jsx-no-literals" | "jsx-no-script-url" | "jsx-no-target-blank" | "jsx-no-useless-fragment" | "jsx-one-expression-per-line" | "jsx-no-undef" | "jsx-curly-brace-presence" | "jsx-pascal-case" | "jsx-fragments" | "jsx-props-no-multi-spaces" | "jsx-props-no-spreading" | "jsx-props-no-spread-multi" | "sort-default-props" | "jsx-sort-default-props" | "jsx-sort-props" | "jsx-tag-spacing" | "jsx-space-before-closing" | "jsx-uses-react" | "jsx-uses-vars" | "jsx-wrap-multilines" | "no-invalid-html-attribute" | "no-access-state-in-setstate" | "no-adjacent-inline-elements" | "no-array-index-key" | "no-arrow-function-lifecycle" | "no-children-prop" | "no-danger" | "no-danger-with-children" | "no-deprecated" | "no-direct-mutation-state" | "no-find-dom-node" | "no-is-mounted" | "no-multi-comp" | "no-namespace" | "no-set-state" | "no-string-refs" | "no-redundant-should-component-update" | "no-render-return-value" | "no-this-in-sfc" | "no-typos" | "no-unescaped-entities" | "no-unknown-property" | "no-unsafe" | "no-unstable-nested-components" | "no-unused-class-component-methods" | "no-unused-prop-types" | "no-unused-state" | "no-object-type-as-default-prop" | "prefer-es6-class" | "prefer-exact-props" | "prefer-read-only-props" | "prefer-stateless-function" | "react-in-jsx-scope" | "require-default-props" | "require-optimization" | "require-render-return" | "self-closing-comp" | "sort-comp" | "sort-prop-types" | "state-in-constructor" | "static-property-placement" | "style-prop-object" | "void-dom-elements-no-children" | "no-did-mount-set-state" | "no-did-update-set-state" | "no-will-update-set-state", 2 | "error">;
-    };
-    'jsx-runtime': {
-        plugins: ["react"];
-        parserOptions: {
-            ecmaFeatures: {
-                jsx: boolean;
-            };
-            jsxPragma: any;
-        };
-        rules: {
-            'react/react-in-jsx-scope': 0;
-            'react/jsx-uses-react': 0;
-        };
-    };
-    flat: Record<string, ReactFlatConfig>;
-};
-type ReactFlatConfig = {
-    plugins: {
-        react: typeof plugin;
-    };
-    rules: import('eslint').Linter.RulesRecord;
-    languageOptions: {
-        parserOptions: import('eslint').Linter.ParserOptions;
-    };
 };
 //# sourceMappingURL=index.d.ts.map

@@ -1,125 +1,112 @@
 'use strict';
 
-const fromEntries = require('object.fromentries');
-const entries = require('object.entries');
+/* eslint global-require: 0 */
 
-const allRules = require('./lib/rules');
-
-function filterRules(rules, predicate) {
-  return fromEntries(entries(rules).filter((entry) => predicate(entry[1])));
-}
-
-/**
- * @param {object} rules - rules object mapping rule name to rule module
- * @returns {Record<string, SEVERITY_ERROR | 'error'>}
- */
-function configureAsError(rules) {
-  return fromEntries(Object.keys(rules).map((key) => [`react/${key}`, 2]));
-}
-
-/** @type {Partial<typeof allRules>} */
-const activeRules = filterRules(allRules, (rule) => !rule.meta.deprecated);
-/** @type {Record<keyof typeof activeRules, 2 | 'error'>} */
-const activeRulesConfig = configureAsError(activeRules);
-
-/** @type {Partial<typeof allRules>} */
-const deprecatedRules = filterRules(allRules, (rule) => rule.meta.deprecated);
-
-/** @type {['react']} */
-// for legacy config system
-const plugins = [
-  'react',
-];
-
-// TODO: with TS 4.5+, inline this
-const SEVERITY_ERROR = /** @type {2} */ (2);
-const SEVERITY_OFF = /** @type {0} */ (0);
-
-const configs = {
-  recommended: {
-    plugins,
-    parserOptions: {
-      ecmaFeatures: {
-        jsx: true,
-      },
-    },
-    rules: {
-      'react/display-name': SEVERITY_ERROR,
-      'react/jsx-key': SEVERITY_ERROR,
-      'react/jsx-no-comment-textnodes': SEVERITY_ERROR,
-      'react/jsx-no-duplicate-props': SEVERITY_ERROR,
-      'react/jsx-no-target-blank': SEVERITY_ERROR,
-      'react/jsx-no-undef': SEVERITY_ERROR,
-      'react/jsx-uses-react': SEVERITY_ERROR,
-      'react/jsx-uses-vars': SEVERITY_ERROR,
-      'react/no-children-prop': SEVERITY_ERROR,
-      'react/no-danger-with-children': SEVERITY_ERROR,
-      'react/no-deprecated': SEVERITY_ERROR,
-      'react/no-direct-mutation-state': SEVERITY_ERROR,
-      'react/no-find-dom-node': SEVERITY_ERROR,
-      'react/no-is-mounted': SEVERITY_ERROR,
-      'react/no-render-return-value': SEVERITY_ERROR,
-      'react/no-string-refs': SEVERITY_ERROR,
-      'react/no-unescaped-entities': SEVERITY_ERROR,
-      'react/no-unknown-property': SEVERITY_ERROR,
-      'react/no-unsafe': SEVERITY_OFF,
-      'react/prop-types': SEVERITY_ERROR,
-      'react/react-in-jsx-scope': SEVERITY_ERROR,
-      'react/require-render-return': SEVERITY_ERROR,
-    },
-  },
-  all: {
-    plugins,
-    parserOptions: {
-      ecmaFeatures: {
-        jsx: true,
-      },
-    },
-    rules: activeRulesConfig,
-  },
-  'jsx-runtime': {
-    plugins,
-    parserOptions: {
-      ecmaFeatures: {
-        jsx: true,
-      },
-      jsxPragma: null, // for @typescript/eslint-parser
-    },
-    rules: {
-      'react/react-in-jsx-scope': SEVERITY_OFF,
-      'react/jsx-uses-react': SEVERITY_OFF,
-    },
-  },
-  flat: /** @type {Record<string, ReactFlatConfig>} */ ({
-    __proto__: null,
-  }),
+/** @satisfies {Record<string, import('eslint').Rule.RuleModule>} */
+const rules = {
+  'boolean-prop-naming': require('./boolean-prop-naming'),
+  'button-has-type': require('./button-has-type'),
+  'checked-requires-onchange-or-readonly': require('./checked-requires-onchange-or-readonly'),
+  'default-props-match-prop-types': require('./default-props-match-prop-types'),
+  'destructuring-assignment': require('./destructuring-assignment'),
+  'display-name': require('./display-name'),
+  'forbid-component-props': require('./forbid-component-props'),
+  'forbid-dom-props': require('./forbid-dom-props'),
+  'forbid-elements': require('./forbid-elements'),
+  'forbid-foreign-prop-types': require('./forbid-foreign-prop-types'),
+  'forbid-prop-types': require('./forbid-prop-types'),
+  'forward-ref-uses-ref': require('./forward-ref-uses-ref'),
+  'function-component-definition': require('./function-component-definition'),
+  'hook-use-state': require('./hook-use-state'),
+  'iframe-missing-sandbox': require('./iframe-missing-sandbox'),
+  'jsx-boolean-value': require('./jsx-boolean-value'),
+  'jsx-child-element-spacing': require('./jsx-child-element-spacing'),
+  'jsx-closing-bracket-location': require('./jsx-closing-bracket-location'),
+  'jsx-closing-tag-location': require('./jsx-closing-tag-location'),
+  'jsx-curly-spacing': require('./jsx-curly-spacing'),
+  'jsx-curly-newline': require('./jsx-curly-newline'),
+  'jsx-equals-spacing': require('./jsx-equals-spacing'),
+  'jsx-filename-extension': require('./jsx-filename-extension'),
+  'jsx-first-prop-new-line': require('./jsx-first-prop-new-line'),
+  'jsx-handler-names': require('./jsx-handler-names'),
+  'jsx-indent': require('./jsx-indent'),
+  'jsx-indent-props': require('./jsx-indent-props'),
+  'jsx-key': require('./jsx-key'),
+  'jsx-max-depth': require('./jsx-max-depth'),
+  'jsx-max-props-per-line': require('./jsx-max-props-per-line'),
+  'jsx-newline': require('./jsx-newline'),
+  'jsx-no-bind': require('./jsx-no-bind'),
+  'jsx-no-comment-textnodes': require('./jsx-no-comment-textnodes'),
+  'jsx-no-constructed-context-values': require('./jsx-no-constructed-context-values'),
+  'jsx-no-duplicate-props': require('./jsx-no-duplicate-props'),
+  'jsx-no-leaked-render': require('./jsx-no-leaked-render'),
+  'jsx-no-literals': require('./jsx-no-literals'),
+  'jsx-no-script-url': require('./jsx-no-script-url'),
+  'jsx-no-target-blank': require('./jsx-no-target-blank'),
+  'jsx-no-useless-fragment': require('./jsx-no-useless-fragment'),
+  'jsx-one-expression-per-line': require('./jsx-one-expression-per-line'),
+  'jsx-no-undef': require('./jsx-no-undef'),
+  'jsx-curly-brace-presence': require('./jsx-curly-brace-presence'),
+  'jsx-pascal-case': require('./jsx-pascal-case'),
+  'jsx-fragments': require('./jsx-fragments'),
+  'jsx-props-no-multi-spaces': require('./jsx-props-no-multi-spaces'),
+  'jsx-props-no-spreading': require('./jsx-props-no-spreading'),
+  'jsx-props-no-spread-multi': require('./jsx-props-no-spread-multi'),
+  'jsx-sort-default-props': require('./jsx-sort-default-props'),
+  'jsx-sort-props': require('./jsx-sort-props'),
+  'jsx-space-before-closing': require('./jsx-space-before-closing'),
+  'jsx-tag-spacing': require('./jsx-tag-spacing'),
+  'jsx-uses-react': require('./jsx-uses-react'),
+  'jsx-uses-vars': require('./jsx-uses-vars'),
+  'jsx-wrap-multilines': require('./jsx-wrap-multilines'),
+  'no-invalid-html-attribute': require('./no-invalid-html-attribute'),
+  'no-access-state-in-setstate': require('./no-access-state-in-setstate'),
+  'no-adjacent-inline-elements': require('./no-adjacent-inline-elements'),
+  'no-array-index-key': require('./no-array-index-key'),
+  'no-arrow-function-lifecycle': require('./no-arrow-function-lifecycle'),
+  'no-children-prop': require('./no-children-prop'),
+  'no-danger': require('./no-danger'),
+  'no-danger-with-children': require('./no-danger-with-children'),
+  'no-deprecated': require('./no-deprecated'),
+  'no-did-mount-set-state': require('./no-did-mount-set-state'),
+  'no-did-update-set-state': require('./no-did-update-set-state'),
+  'no-direct-mutation-state': require('./no-direct-mutation-state'),
+  'no-find-dom-node': require('./no-find-dom-node'),
+  'no-is-mounted': require('./no-is-mounted'),
+  'no-multi-comp': require('./no-multi-comp'),
+  'no-namespace': require('./no-namespace'),
+  'no-set-state': require('./no-set-state'),
+  'no-string-refs': require('./no-string-refs'),
+  'no-redundant-should-component-update': require('./no-redundant-should-component-update'),
+  'no-render-return-value': require('./no-render-return-value'),
+  'no-this-in-sfc': require('./no-this-in-sfc'),
+  'no-typos': require('./no-typos'),
+  'no-unescaped-entities': require('./no-unescaped-entities'),
+  'no-unknown-property': require('./no-unknown-property'),
+  'no-unsafe': require('./no-unsafe'),
+  'no-unstable-nested-components': require('./no-unstable-nested-components'),
+  'no-unused-class-component-methods': require('./no-unused-class-component-methods'),
+  'no-unused-prop-types': require('./no-unused-prop-types'),
+  'no-unused-state': require('./no-unused-state'),
+  'no-object-type-as-default-prop': require('./no-object-type-as-default-prop'),
+  'no-will-update-set-state': require('./no-will-update-set-state'),
+  'prefer-es6-class': require('./prefer-es6-class'),
+  'prefer-exact-props': require('./prefer-exact-props'),
+  'prefer-read-only-props': require('./prefer-read-only-props'),
+  'prefer-stateless-function': require('./prefer-stateless-function'),
+  'prop-types': require('./prop-types'),
+  'react-in-jsx-scope': require('./react-in-jsx-scope'),
+  'require-default-props': require('./require-default-props'),
+  'require-optimization': require('./require-optimization'),
+  'require-render-return': require('./require-render-return'),
+  'self-closing-comp': require('./self-closing-comp'),
+  'sort-comp': require('./sort-comp'),
+  'sort-default-props': require('./sort-default-props'),
+  'sort-prop-types': require('./sort-prop-types'),
+  'state-in-constructor': require('./state-in-constructor'),
+  'static-property-placement': require('./static-property-placement'),
+  'style-prop-object': require('./style-prop-object'),
+  'void-dom-elements-no-children': require('./void-dom-elements-no-children'),
 };
 
-/** @typedef {{ plugins: { react: typeof plugin }, rules: import('eslint').Linter.RulesRecord, languageOptions: { parserOptions: import('eslint').Linter.ParserOptions } }} ReactFlatConfig */
-
-/** @type {{ deprecatedRules: typeof deprecatedRules, rules: typeof allRules, configs: typeof configs & { flat: Record<string, ReactFlatConfig> }}} */
-const plugin = {
-  deprecatedRules,
-  rules: allRules,
-  configs,
-};
-
-Object.assign(configs.flat, {
-  recommended: {
-    plugins: { react: plugin },
-    rules: configs.recommended.rules,
-    languageOptions: { parserOptions: configs.recommended.parserOptions },
-  },
-  all: {
-    plugins: { react: plugin },
-    rules: configs.all.rules,
-    languageOptions: { parserOptions: configs.all.parserOptions },
-  },
-  'jsx-runtime': {
-    plugins: { react: plugin },
-    rules: configs['jsx-runtime'].rules,
-    languageOptions: { parserOptions: configs['jsx-runtime'].parserOptions },
-  },
-});
-
-module.exports = plugin;
+module.exports = rules;
