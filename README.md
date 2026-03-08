@@ -1,304 +1,423 @@
-[![npm version](https://img.shields.io/npm/v/eslint.svg)](https://www.npmjs.com/package/eslint)
-[![Downloads](https://img.shields.io/npm/dm/eslint.svg)](https://www.npmjs.com/package/eslint)
-[![Build Status](https://github.com/eslint/eslint/workflows/CI/badge.svg)](https://github.com/eslint/eslint/actions)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Feslint%2Feslint.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Feslint%2Feslint?ref=badge_shield)
-<br />
-[![Open Collective Backers](https://img.shields.io/opencollective/backers/eslint)](https://opencollective.com/eslint)
-[![Open Collective Sponsors](https://img.shields.io/opencollective/sponsors/eslint)](https://opencollective.com/eslint)
-[![Follow us on Twitter](https://img.shields.io/twitter/follow/geteslint?label=Follow&style=social)](https://twitter.com/intent/user?screen_name=geteslint)
+# `eslint-plugin-react` <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
 
-# ESLint
+===================
 
-[Website](https://eslint.org) |
-[Configure ESLint](https://eslint.org/docs/latest/use/configure) |
-[Rules](https://eslint.org/docs/rules/) |
-[Contribute to ESLint](https://eslint.org/docs/latest/contribute) |
-[Report Bugs](https://eslint.org/docs/latest/contribute/report-bugs) |
-[Code of Conduct](https://eslint.org/conduct) |
-[Twitter](https://twitter.com/geteslint) |
-[Discord](https://eslint.org/chat) |
-[Mastodon](https://fosstodon.org/@eslint)
+[![github actions][actions-image]][actions-url]
+[![Maintenance Status][status-image]][status-url]
+[![NPM version][npm-image]][npm-url]
+[![Tidelift][tidelift-image]][tidelift-url]
 
-ESLint is a tool for identifying and reporting on patterns found in ECMAScript/JavaScript code. In many ways, it is similar to JSLint and JSHint with a few exceptions:
+React specific linting rules for `eslint`
 
-* ESLint uses [Espree](https://github.com/eslint/espree) for JavaScript parsing.
-* ESLint uses an AST to evaluate patterns in code.
-* ESLint is completely pluggable, every single rule is a plugin and you can add more at runtime.
+## Installation
 
-## Table of Contents
-
-1. [Installation and Usage](#installation-and-usage)
-2. [Configuration](#configuration)
-3. [Code of Conduct](#code-of-conduct)
-4. [Filing Issues](#filing-issues)
-5. [Frequently Asked Questions](#frequently-asked-questions)
-6. [Releases](#releases)
-7. [Security Policy](#security-policy)
-8. [Semantic Versioning Policy](#semantic-versioning-policy)
-9. [Stylistic Rule Updates](#stylistic-rule-updates)
-10. [License](#license)
-11. [Team](#team)
-12. [Sponsors](#sponsors)
-13. [Technology Sponsors](#technology-sponsors)
-
-## Installation and Usage
-
-Prerequisites: [Node.js](https://nodejs.org/) (`^12.22.0`, `^14.17.0`, or `>=16.0.0`) built with SSL support. (If you are using an official Node.js distribution, SSL is always built in.)
-
-You can install and configure ESLint using this command:
-
-```shell
-npm init @eslint/config
+```sh
+npm install eslint eslint-plugin-react --save-dev
 ```
 
-After that, you can run ESLint on any file or directory like this:
+It is also possible to install ESLint globally rather than locally (using `npm install -g eslint`). However, this is not recommended, and any plugins or shareable configs that you use must be installed locally in either case.
 
-```shell
-./node_modules/.bin/eslint yourfile.js
-```
+## Configuration (legacy: `.eslintrc*`) <a id="configuration"></a>
 
-## Configuration
-
-After running `npm init @eslint/config`, you'll have an `.eslintrc` file in your directory. In it, you'll see some rules configured like this:
+Use [our preset](#recommended) to get reasonable defaults:
 
 ```json
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ]
+```
+
+If you are using the [new JSX transform from React 17](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html#removing-unused-react-imports), extend [`react/jsx-runtime`](https://github.com/jsx-eslint/eslint-plugin-react/blob/c8917b0885094b5e4cc2a6f613f7fb6f16fe932e/index.js#L163-L176) in your eslint config (add `"plugin:react/jsx-runtime"` to `"extends"`) to disable the relevant rules.
+
+You should also specify settings that will be shared across all the plugin rules. ([More about eslint shared settings](https://eslint.org/docs/latest/use/configure/configuration-files#configuring-shared-settings))
+
+```json5
 {
-    "rules": {
-        "semi": ["error", "always"],
-        "quotes": ["error", "double"]
-    }
+  "settings": {
+    "react": {
+      "createClass": "createReactClass", // Regex for Component Factory to use,
+                                         // default to "createReactClass"
+      "pragma": "React",  // Pragma to use, default to "React"
+      "fragment": "Fragment",  // Fragment to use (may be a property of <pragma>), default to "Fragment"
+      "version": "detect", // React version. "detect" automatically picks the version you have installed.
+                           // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+                           // Defaults to the "defaultVersion" setting and warns if missing, and to "detect" in the future
+      "defaultVersion": "", // Default React version to use when the version you have installed cannot be detected.
+                            // If not provided, defaults to the latest React version.
+      "flowVersion": "0.53" // Flow version
+    },
+    "propWrapperFunctions": [
+        // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
+        "forbidExtraProps",
+        {"property": "freeze", "object": "Object"},
+        {"property": "myFavoriteWrapper"},
+        // for rules that check exact prop wrappers
+        {"property": "forbidExtraProps", "exact": true}
+    ],
+    "componentWrapperFunctions": [
+        // The name of any function used to wrap components, e.g. Mobx `observer` function. If this isn't set, components wrapped by these functions will be skipped.
+        "observer", // `property`
+        {"property": "styled"}, // `object` is optional
+        {"property": "observer", "object": "Mobx"},
+        {"property": "observer", "object": "<pragma>"} // sets `object` to whatever value `settings.react.pragma` is set to
+    ],
+    "formComponents": [
+      // Components used as alternatives to <form> for forms, eg. <Form endpoint={ url } />
+      "CustomForm",
+      {"name": "SimpleForm", "formAttribute": "endpoint"},
+      {"name": "Form", "formAttribute": ["registerEndpoint", "loginEndpoint"]}, // allows specifying multiple properties if necessary
+    ],
+    "linkComponents": [
+      // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
+      "Hyperlink",
+      {"name": "MyLink", "linkAttribute": "to"},
+      {"name": "Link", "linkAttribute": ["to", "href"]}, // allows specifying multiple properties if necessary
+    ]
+  }
 }
 ```
 
-The names `"semi"` and `"quotes"` are the names of [rules](https://eslint.org/docs/rules) in ESLint. The first value is the error level of the rule and can be one of these values:
+If you do not use a preset you will need to specify individual rules and add extra configuration.
 
-* `"off"` or `0` - turn the rule off
-* `"warn"` or `1` - turn the rule on as a warning (doesn't affect exit code)
-* `"error"` or `2` - turn the rule on as an error (exit code will be 1)
+Add "react" to the plugins section.
 
-The three error levels allow you fine-grained control over how ESLint applies rules (for more configuration options and details, see the [configuration docs](https://eslint.org/docs/latest/use/configure)).
+```json
+{
+  "plugins": [
+    "react"
+  ]
+}
+```
 
-## Code of Conduct
+Enable JSX support.
 
-ESLint adheres to the [JS Foundation Code of Conduct](https://eslint.org/conduct).
+With `eslint` 2+
 
-## Filing Issues
+```json
+{
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  }
+}
+```
 
-Before filing an issue, please be sure to read the guidelines for what you're reporting:
+Enable the rules that you would like to use.
 
-* [Bug Report](https://eslint.org/docs/latest/contribute/report-bugs)
-* [Propose a New Rule](https://eslint.org/docs/latest/contribute/propose-new-rule)
-* [Proposing a Rule Change](https://eslint.org/docs/latest/contribute/propose-rule-change)
-* [Request a Change](https://eslint.org/docs/latest/contribute/request-change)
+```json
+  "rules": {
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+  }
+```
 
-## Frequently Asked Questions
+### Shareable configs
 
-### I'm using JSCS, should I migrate to ESLint?
+#### Recommended
 
-Yes. [JSCS has reached end of life](https://eslint.org/blog/2016/07/jscs-end-of-life) and is no longer supported.
+This plugin exports a `recommended` configuration that enforces React good practices.
 
-We have prepared a [migration guide](https://eslint.org/docs/latest/use/migrating-from-jscs) to help you convert your JSCS settings to an ESLint configuration.
+To enable this configuration use the `extends` property in your `.eslintrc` config file:
 
-We are now at or near 100% compatibility with JSCS. If you try ESLint and believe we are not yet compatible with a JSCS rule/configuration, please create an issue (mentioning that it is a JSCS compatibility issue) and we will evaluate it as per our normal process.
+```json
+{
+  "extends": ["eslint:recommended", "plugin:react/recommended"]
+}
+```
 
-### Does Prettier replace ESLint?
+See [`eslint` documentation](https://eslint.org/docs/user-guide/configuring/configuration-files#extending-configuration-files) for more information about extending configuration files.
 
-No, ESLint and Prettier have diffent jobs: ESLint is a linter (looking for problematic patterns) and Prettier is a code formatter. Using both tools is common, refer to [Prettier's documentation](https://prettier.io/docs/en/install#eslint-and-other-linters) to learn how to configure them to work well with each other.
+#### All
 
-### Why can't ESLint find my plugins?
+This plugin also exports an `all` configuration that includes every available rule.
+This pairs well with the `eslint:all` rule.
 
-* Make sure your plugins (and ESLint) are both in your project's `package.json` as devDependencies (or dependencies, if your project uses ESLint at runtime).
-* Make sure you have run `npm install` and all your dependencies are installed.
-* Make sure your plugins' peerDependencies have been installed as well. You can use `npm view eslint-plugin-myplugin peerDependencies` to see what peer dependencies `eslint-plugin-myplugin` has.
+```json
+{
+  "plugins": [
+    "react"
+  ],
+  "extends": ["eslint:all", "plugin:react/all"]
+}
+```
 
-### Does ESLint support JSX?
+**Note**: These configurations will import `eslint-plugin-react` and enable JSX in [parser options](https://eslint.org/docs/user-guide/configuring/language-options#specifying-parser-options).
 
-Yes, ESLint natively supports parsing JSX syntax (this must be enabled in [configuration](https://eslint.org/docs/latest/use/configure)). Please note that supporting JSX syntax *is not* the same as supporting React. React applies specific semantics to JSX syntax that ESLint doesn't recognize. We recommend using [eslint-plugin-react](https://www.npmjs.com/package/eslint-plugin-react) if you are using React and want React semantics.
+## Configuration (new: `eslint.config.js`)
 
-### What ECMAScript versions does ESLint support?
+From [`v8.21.0`](https://github.com/eslint/eslint/releases/tag/v8.21.0), eslint announced a new config system.
+In the new system, `.eslintrc*` is no longer used. `eslint.config.js` would be the default config file name.
+In eslint `v8`, the legacy system (`.eslintrc*`) would still be supported, while in eslint `v9`, only the new system would be supported.
 
-ESLint has full support for ECMAScript 3, 5 (default), 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, and 2023. You can set your desired ECMAScript syntax (and other settings, like global variables or your target environments) through [configuration](https://eslint.org/docs/latest/use/configure).
+And from [`v8.23.0`](https://github.com/eslint/eslint/releases/tag/v8.23.0), eslint CLI starts to look up `eslint.config.js`.
+**So, if your eslint is `>=8.23.0`, you're 100% ready to use the new config system.**
 
-### What about experimental features?
+You might want to check out the official blog posts,
 
-ESLint's parser only officially supports the latest final ECMAScript standard. We will make changes to core rules in order to avoid crashes on stage 3 ECMAScript syntax proposals (as long as they are implemented using the correct experimental ESTree syntax). We may make changes to core rules to better work with language extensions (such as JSX, Flow, and TypeScript) on a case-by-case basis.
+- <https://eslint.org/blog/2022/08/new-config-system-part-1/>
+- <https://eslint.org/blog/2022/08/new-config-system-part-2/>
+- <https://eslint.org/blog/2022/08/new-config-system-part-3/>
 
-In other cases (including if rules need to warn on more or fewer cases due to new syntax, rather than just not crashing), we recommend you use other parsers and/or rule plugins. If you are using Babel, you can use [@babel/eslint-parser](https://www.npmjs.com/package/@babel/eslint-parser) and [@babel/eslint-plugin](https://www.npmjs.com/package/@babel/eslint-plugin) to use any option available in Babel.
+and the [official docs](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new).
 
-Once a language feature has been adopted into the ECMAScript standard (stage 4 according to the [TC39 process](https://tc39.github.io/process-document/)), we will accept issues and pull requests related to the new feature, subject to our [contributing guidelines](https://eslint.org/docs/latest/contribute). Until then, please use the appropriate parser and plugin(s) for your experimental feature.
+### Plugin
 
-### Where to ask for help?
+The default export of `eslint-plugin-react` is a plugin object.
 
-Open a [discussion](https://github.com/eslint/eslint/discussions) or stop by our [Discord server](https://eslint.org/chat).
+```js
+const react = require('eslint-plugin-react');
+const globals = require('globals');
 
-### Why doesn't ESLint lock dependency versions?
+module.exports = [
+  …
+  {
+    files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
+    plugins: {
+      react,
+    },
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+      },
+    },
+    rules: {
+      // ... any rules you want
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+     },
+    // ... others are omitted for brevity
+  },
+  …
+];
+```
 
-Lock files like `package-lock.json` are helpful for deployed applications. They ensure that dependencies are consistent between environments and across deployments.
+### Configuring shared settings
 
-Packages like `eslint` that get published to the npm registry do not include lock files. `npm install eslint` as a user will respect version constraints in ESLint's `package.json`. ESLint and its dependencies will be included in the user's lock file if one exists, but ESLint's own lock file would not be used.
+Refer to the [official docs](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#configuring-shared-settings).
 
-We intentionally don't lock dependency versions so that we have the latest compatible dependency versions in development and CI that our users get when installing ESLint in a project.
+The schema of the `settings.react` object would be identical to that of what's already described above in the legacy config section.
 
-The Twilio blog has a [deeper dive](https://www.twilio.com/blog/lockfiles-nodejs) to learn more.
+<!-- markdownlint-disable-next-line no-duplicate-heading -->
+### Flat Configs
 
-## Releases
+This plugin exports 3 flat configs:
 
-We have scheduled releases every two weeks on Friday or Saturday. You can follow a [release issue](https://github.com/eslint/eslint/issues?q=is%3Aopen+is%3Aissue+label%3Arelease) for updates about the scheduling of any particular release.
+- `flat.all`
+- `flat.recommended`
+- `flat['jsx-runtime']`
 
-## Security Policy
+The flat configs are available via the root plugin import. They will configure the plugin under the `react/` namespace and enable JSX in [`languageOptions.parserOptions`](https://eslint.org/docs/latest/use/configure/language-options#specifying-parser-options).
 
-ESLint takes security seriously. We work hard to ensure that ESLint is safe for everyone and that security issues are addressed quickly and responsibly. Read the full [security policy](https://github.com/eslint/.github/blob/master/SECURITY.md).
+```js
+const reactPlugin = require('eslint-plugin-react');
 
-## Semantic Versioning Policy
+module.exports = [
+  …
+  reactPlugin.configs.flat.recommended, // This is not a plugin object, but a shareable config object
+  reactPlugin.configs.flat['jsx-runtime'], // Add this if you are using React 17+
+  …
+];
+```
 
-ESLint follows [semantic versioning](https://semver.org). However, due to the nature of ESLint as a code quality tool, it's not always clear when a minor or major version bump occurs. To help clarify this for everyone, we've defined the following semantic versioning policy for ESLint:
+You can of course add/override some properties.
 
-* Patch release (intended to not break your lint build)
-    * A bug fix in a rule that results in ESLint reporting fewer linting errors.
-    * A bug fix to the CLI or core (including formatters).
-    * Improvements to documentation.
-    * Non-user-facing changes such as refactoring code, adding, deleting, or modifying tests, and increasing test coverage.
-    * Re-releasing after a failed release (i.e., publishing a release that doesn't work for anyone).
-* Minor release (might break your lint build)
-    * A bug fix in a rule that results in ESLint reporting more linting errors.
-    * A new rule is created.
-    * A new option to an existing rule that does not result in ESLint reporting more linting errors by default.
-    * A new addition to an existing rule to support a newly-added language feature (within the last 12 months) that will result in ESLint reporting more linting errors by default.
-    * An existing rule is deprecated.
-    * A new CLI capability is created.
-    * New capabilities to the public API are added (new classes, new methods, new arguments to existing methods, etc.).
-    * A new formatter is created.
-    * `eslint:recommended` is updated and will result in strictly fewer linting errors (e.g., rule removals).
-* Major release (likely to break your lint build)
-    * `eslint:recommended` is updated and may result in new linting errors (e.g., rule additions, most rule option updates).
-    * A new option to an existing rule that results in ESLint reporting more linting errors by default.
-    * An existing formatter is removed.
-    * Part of the public API is removed or changed in an incompatible way. The public API includes:
-        * Rule schemas
-        * Configuration schema
-        * Command-line options
-        * Node.js API
-        * Rule, formatter, parser, plugin APIs
+**Note**: Our shareable configs does not preconfigure `files` or [`languageOptions.globals`](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#configuration-objects).
+For most of the cases, you probably want to configure some properties by yourself.
 
-According to our policy, any minor update may report more linting errors than the previous release (ex: from a bug fix). As such, we recommend using the tilde (`~`) in `package.json` e.g. `"eslint": "~3.1.0"` to guarantee the results of your builds.
+```js
+const reactPlugin = require('eslint-plugin-react');
+const globals = require('globals');
 
-## Stylistic Rule Updates
+module.exports = [
+  …
+  {
+    files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+    ...reactPlugin.configs.flat.recommended,
+    languageOptions: {
+      ...reactPlugin.configs.flat.recommended.languageOptions,
+      globals: {
+        ...globals.serviceworker,
+        ...globals.browser,
+      },
+    },
+  },
+  …
+];
+```
 
-Stylistic rules are frozen according to [our policy](https://eslint.org/blog/2020/05/changes-to-rules-policies) on how we evaluate new rules and rule changes.
-This means:
+The above example is same as the example below, as the new config system is based on chaining.
 
-* **Bug fixes**: We will still fix bugs in stylistic rules.
-* **New ECMAScript features**: We will also make sure stylistic rules are compatible with new ECMAScript features.
-* **New options**: We will **not** add any new options to stylistic rules unless an option is the only way to fix a bug or support a newly-added ECMAScript feature.
+```js
+const reactPlugin = require('eslint-plugin-react');
+const globals = require('globals');
+
+module.exports = [
+  …
+  {
+    files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+    ...reactPlugin.configs.flat.recommended,
+  },
+  {
+    files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+        ...globals.browser,
+      },
+    },
+  },
+  …
+];
+```
+
+## List of supported rules
+
+<!-- begin auto-generated rules list -->
+
+💼 [Configurations](https://github.com/jsx-eslint/eslint-plugin-react/#shareable-configs) enabled in.\
+🚫 [Configurations](https://github.com/jsx-eslint/eslint-plugin-react/#shareable-configs) disabled in.\
+🏃 Set in the `jsx-runtime` [configuration](https://github.com/jsx-eslint/eslint-plugin-react/#shareable-configs).\
+☑️ Set in the `recommended` [configuration](https://github.com/jsx-eslint/eslint-plugin-react/#shareable-configs).\
+🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).\
+💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).\
+❌ Deprecated.
+
+| Name                                                                                         | Description                                                                                                                                  | 💼 | 🚫 | 🔧 | 💡 | ❌  |
+| :------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :- | :- | :- | :- | :- |
+| [boolean-prop-naming](docs/rules/boolean-prop-naming.md)                                     | Enforces consistent naming for boolean props                                                                                                 |    |    |    |    |    |
+| [button-has-type](docs/rules/button-has-type.md)                                             | Disallow usage of `button` elements without an explicit `type` attribute                                                                     |    |    |    |    |    |
+| [checked-requires-onchange-or-readonly](docs/rules/checked-requires-onchange-or-readonly.md) | Enforce using `onChange` or `readonly` attribute when `checked` is used                                                                      |    |    |    |    |    |
+| [default-props-match-prop-types](docs/rules/default-props-match-prop-types.md)               | Enforce all defaultProps have a corresponding non-required PropType                                                                          |    |    |    |    |    |
+| [destructuring-assignment](docs/rules/destructuring-assignment.md)                           | Enforce consistent usage of destructuring assignment of props, state, and context                                                            |    |    | 🔧 |    |    |
+| [display-name](docs/rules/display-name.md)                                                   | Disallow missing displayName in a React component definition                                                                                 | ☑️ |    |    |    |    |
+| [forbid-component-props](docs/rules/forbid-component-props.md)                               | Disallow certain props on components                                                                                                         |    |    |    |    |    |
+| [forbid-dom-props](docs/rules/forbid-dom-props.md)                                           | Disallow certain props on DOM Nodes                                                                                                          |    |    |    |    |    |
+| [forbid-elements](docs/rules/forbid-elements.md)                                             | Disallow certain elements                                                                                                                    |    |    |    |    |    |
+| [forbid-foreign-prop-types](docs/rules/forbid-foreign-prop-types.md)                         | Disallow using another component's propTypes                                                                                                 |    |    |    |    |    |
+| [forbid-prop-types](docs/rules/forbid-prop-types.md)                                         | Disallow certain propTypes                                                                                                                   |    |    |    |    |    |
+| [forward-ref-uses-ref](docs/rules/forward-ref-uses-ref.md)                                   | Require all forwardRef components include a ref parameter                                                                                    |    |    |    | 💡 |    |
+| [function-component-definition](docs/rules/function-component-definition.md)                 | Enforce a specific function type for function components                                                                                     |    |    | 🔧 |    |    |
+| [hook-use-state](docs/rules/hook-use-state.md)                                               | Ensure destructuring and symmetric naming of useState hook value and setter variables                                                        |    |    |    | 💡 |    |
+| [iframe-missing-sandbox](docs/rules/iframe-missing-sandbox.md)                               | Enforce sandbox attribute on iframe elements                                                                                                 |    |    |    |    |    |
+| [jsx-boolean-value](docs/rules/jsx-boolean-value.md)                                         | Enforce boolean attributes notation in JSX                                                                                                   |    |    | 🔧 |    |    |
+| [jsx-child-element-spacing](docs/rules/jsx-child-element-spacing.md)                         | Enforce or disallow spaces inside of curly braces in JSX attributes and expressions                                                          |    |    |    |    |    |
+| [jsx-closing-bracket-location](docs/rules/jsx-closing-bracket-location.md)                   | Enforce closing bracket location in JSX                                                                                                      |    |    | 🔧 |    |    |
+| [jsx-closing-tag-location](docs/rules/jsx-closing-tag-location.md)                           | Enforce closing tag location for multiline JSX                                                                                               |    |    | 🔧 |    |    |
+| [jsx-curly-brace-presence](docs/rules/jsx-curly-brace-presence.md)                           | Disallow unnecessary JSX expressions when literals alone are sufficient or enforce JSX expressions on literals in JSX children or attributes |    |    | 🔧 |    |    |
+| [jsx-curly-newline](docs/rules/jsx-curly-newline.md)                                         | Enforce consistent linebreaks in curly braces in JSX attributes and expressions                                                              |    |    | 🔧 |    |    |
+| [jsx-curly-spacing](docs/rules/jsx-curly-spacing.md)                                         | Enforce or disallow spaces inside of curly braces in JSX attributes and expressions                                                          |    |    | 🔧 |    |    |
+| [jsx-equals-spacing](docs/rules/jsx-equals-spacing.md)                                       | Enforce or disallow spaces around equal signs in JSX attributes                                                                              |    |    | 🔧 |    |    |
+| [jsx-filename-extension](docs/rules/jsx-filename-extension.md)                               | Disallow file extensions that may contain JSX                                                                                                |    |    |    |    |    |
+| [jsx-first-prop-new-line](docs/rules/jsx-first-prop-new-line.md)                             | Enforce proper position of the first property in JSX                                                                                         |    |    | 🔧 |    |    |
+| [jsx-fragments](docs/rules/jsx-fragments.md)                                                 | Enforce shorthand or standard form for React fragments                                                                                       |    |    | 🔧 |    |    |
+| [jsx-handler-names](docs/rules/jsx-handler-names.md)                                         | Enforce event handler naming conventions in JSX                                                                                              |    |    |    |    |    |
+| [jsx-indent](docs/rules/jsx-indent.md)                                                       | Enforce JSX indentation                                                                                                                      |    |    | 🔧 |    |    |
+| [jsx-indent-props](docs/rules/jsx-indent-props.md)                                           | Enforce props indentation in JSX                                                                                                             |    |    | 🔧 |    |    |
+| [jsx-key](docs/rules/jsx-key.md)                                                             | Disallow missing `key` props in iterators/collection literals                                                                                | ☑️ |    |    |    |    |
+| [jsx-max-depth](docs/rules/jsx-max-depth.md)                                                 | Enforce JSX maximum depth                                                                                                                    |    |    |    |    |    |
+| [jsx-max-props-per-line](docs/rules/jsx-max-props-per-line.md)                               | Enforce maximum of props on a single line in JSX                                                                                             |    |    | 🔧 |    |    |
+| [jsx-newline](docs/rules/jsx-newline.md)                                                     | Require or prevent a new line after jsx elements and expressions.                                                                            |    |    | 🔧 |    |    |
+| [jsx-no-bind](docs/rules/jsx-no-bind.md)                                                     | Disallow `.bind()` or arrow functions in JSX props                                                                                           |    |    |    |    |    |
+| [jsx-no-comment-textnodes](docs/rules/jsx-no-comment-textnodes.md)                           | Disallow comments from being inserted as text nodes                                                                                          | ☑️ |    |    |    |    |
+| [jsx-no-constructed-context-values](docs/rules/jsx-no-constructed-context-values.md)         | Disallows JSX context provider values from taking values that will cause needless rerenders                                                  |    |    |    |    |    |
+| [jsx-no-duplicate-props](docs/rules/jsx-no-duplicate-props.md)                               | Disallow duplicate properties in JSX                                                                                                         | ☑️ |    |    |    |    |
+| [jsx-no-leaked-render](docs/rules/jsx-no-leaked-render.md)                                   | Disallow problematic leaked values from being rendered                                                                                       |    |    | 🔧 |    |    |
+| [jsx-no-literals](docs/rules/jsx-no-literals.md)                                             | Disallow usage of string literals in JSX                                                                                                     |    |    |    |    |    |
+| [jsx-no-script-url](docs/rules/jsx-no-script-url.md)                                         | Disallow usage of `javascript:` URLs                                                                                                         |    |    |    |    |    |
+| [jsx-no-target-blank](docs/rules/jsx-no-target-blank.md)                                     | Disallow `target="_blank"` attribute without `rel="noreferrer"`                                                                              | ☑️ |    | 🔧 |    |    |
+| [jsx-no-undef](docs/rules/jsx-no-undef.md)                                                   | Disallow undeclared variables in JSX                                                                                                         | ☑️ |    |    |    |    |
+| [jsx-no-useless-fragment](docs/rules/jsx-no-useless-fragment.md)                             | Disallow unnecessary fragments                                                                                                               |    |    | 🔧 |    |    |
+| [jsx-one-expression-per-line](docs/rules/jsx-one-expression-per-line.md)                     | Require one JSX element per line                                                                                                             |    |    | 🔧 |    |    |
+| [jsx-pascal-case](docs/rules/jsx-pascal-case.md)                                             | Enforce PascalCase for user-defined JSX components                                                                                           |    |    |    |    |    |
+| [jsx-props-no-multi-spaces](docs/rules/jsx-props-no-multi-spaces.md)                         | Disallow multiple spaces between inline JSX props                                                                                            |    |    | 🔧 |    |    |
+| [jsx-props-no-spread-multi](docs/rules/jsx-props-no-spread-multi.md)                         | Disallow JSX prop spreading the same identifier multiple times                                                                               |    |    |    |    |    |
+| [jsx-props-no-spreading](docs/rules/jsx-props-no-spreading.md)                               | Disallow JSX prop spreading                                                                                                                  |    |    |    |    |    |
+| [jsx-sort-default-props](docs/rules/jsx-sort-default-props.md)                               | Enforce defaultProps declarations alphabetical sorting                                                                                       |    |    |    |    | ❌  |
+| [jsx-sort-props](docs/rules/jsx-sort-props.md)                                               | Enforce props alphabetical sorting                                                                                                           |    |    | 🔧 |    |    |
+| [jsx-space-before-closing](docs/rules/jsx-space-before-closing.md)                           | Enforce spacing before closing bracket in JSX                                                                                                |    |    | 🔧 |    | ❌  |
+| [jsx-tag-spacing](docs/rules/jsx-tag-spacing.md)                                             | Enforce whitespace in and around the JSX opening and closing brackets                                                                        |    |    | 🔧 |    |    |
+| [jsx-uses-react](docs/rules/jsx-uses-react.md)                                               | Disallow React to be incorrectly marked as unused                                                                                            | ☑️ | 🏃 |    |    |    |
+| [jsx-uses-vars](docs/rules/jsx-uses-vars.md)                                                 | Disallow variables used in JSX to be incorrectly marked as unused                                                                            | ☑️ |    |    |    |    |
+| [jsx-wrap-multilines](docs/rules/jsx-wrap-multilines.md)                                     | Disallow missing parentheses around multiline JSX                                                                                            |    |    | 🔧 |    |    |
+| [no-access-state-in-setstate](docs/rules/no-access-state-in-setstate.md)                     | Disallow when this.state is accessed within setState                                                                                         |    |    |    |    |    |
+| [no-adjacent-inline-elements](docs/rules/no-adjacent-inline-elements.md)                     | Disallow adjacent inline elements not separated by whitespace.                                                                               |    |    |    |    |    |
+| [no-array-index-key](docs/rules/no-array-index-key.md)                                       | Disallow usage of Array index in keys                                                                                                        |    |    |    |    |    |
+| [no-arrow-function-lifecycle](docs/rules/no-arrow-function-lifecycle.md)                     | Lifecycle methods should be methods on the prototype, not class fields                                                                       |    |    | 🔧 |    |    |
+| [no-children-prop](docs/rules/no-children-prop.md)                                           | Disallow passing of children as props                                                                                                        | ☑️ |    |    |    |    |
+| [no-danger](docs/rules/no-danger.md)                                                         | Disallow usage of dangerous JSX properties                                                                                                   |    |    |    |    |    |
+| [no-danger-with-children](docs/rules/no-danger-with-children.md)                             | Disallow when a DOM element is using both children and dangerouslySetInnerHTML                                                               | ☑️ |    |    |    |    |
+| [no-deprecated](docs/rules/no-deprecated.md)                                                 | Disallow usage of deprecated methods                                                                                                         | ☑️ |    |    |    |    |
+| [no-did-mount-set-state](docs/rules/no-did-mount-set-state.md)                               | Disallow usage of setState in componentDidMount                                                                                              |    |    |    |    |    |
+| [no-did-update-set-state](docs/rules/no-did-update-set-state.md)                             | Disallow usage of setState in componentDidUpdate                                                                                             |    |    |    |    |    |
+| [no-direct-mutation-state](docs/rules/no-direct-mutation-state.md)                           | Disallow direct mutation of this.state                                                                                                       | ☑️ |    |    |    |    |
+| [no-find-dom-node](docs/rules/no-find-dom-node.md)                                           | Disallow usage of findDOMNode                                                                                                                | ☑️ |    |    |    |    |
+| [no-invalid-html-attribute](docs/rules/no-invalid-html-attribute.md)                         | Disallow usage of invalid attributes                                                                                                         |    |    |    | 💡 |    |
+| [no-is-mounted](docs/rules/no-is-mounted.md)                                                 | Disallow usage of isMounted                                                                                                                  | ☑️ |    |    |    |    |
+| [no-multi-comp](docs/rules/no-multi-comp.md)                                                 | Disallow multiple component definition per file                                                                                              |    |    |    |    |    |
+| [no-namespace](docs/rules/no-namespace.md)                                                   | Enforce that namespaces are not used in React elements                                                                                       |    |    |    |    |    |
+| [no-object-type-as-default-prop](docs/rules/no-object-type-as-default-prop.md)               | Disallow usage of referential-type variables as default param in functional component                                                        |    |    |    |    |    |
+| [no-redundant-should-component-update](docs/rules/no-redundant-should-component-update.md)   | Disallow usage of shouldComponentUpdate when extending React.PureComponent                                                                   |    |    |    |    |    |
+| [no-render-return-value](docs/rules/no-render-return-value.md)                               | Disallow usage of the return value of ReactDOM.render                                                                                        | ☑️ |    |    |    |    |
+| [no-set-state](docs/rules/no-set-state.md)                                                   | Disallow usage of setState                                                                                                                   |    |    |    |    |    |
+| [no-string-refs](docs/rules/no-string-refs.md)                                               | Disallow using string references                                                                                                             | ☑️ |    |    |    |    |
+| [no-this-in-sfc](docs/rules/no-this-in-sfc.md)                                               | Disallow `this` from being used in stateless functional components                                                                           |    |    |    |    |    |
+| [no-typos](docs/rules/no-typos.md)                                                           | Disallow common typos                                                                                                                        |    |    |    |    |    |
+| [no-unescaped-entities](docs/rules/no-unescaped-entities.md)                                 | Disallow unescaped HTML entities from appearing in markup                                                                                    | ☑️ |    |    | 💡 |    |
+| [no-unknown-property](docs/rules/no-unknown-property.md)                                     | Disallow usage of unknown DOM property                                                                                                       | ☑️ |    | 🔧 |    |    |
+| [no-unsafe](docs/rules/no-unsafe.md)                                                         | Disallow usage of unsafe lifecycle methods                                                                                                   |    | ☑️ |    |    |    |
+| [no-unstable-nested-components](docs/rules/no-unstable-nested-components.md)                 | Disallow creating unstable components inside components                                                                                      |    |    |    |    |    |
+| [no-unused-class-component-methods](docs/rules/no-unused-class-component-methods.md)         | Disallow declaring unused methods of component class                                                                                         |    |    |    |    |    |
+| [no-unused-prop-types](docs/rules/no-unused-prop-types.md)                                   | Disallow definitions of unused propTypes                                                                                                     |    |    |    |    |    |
+| [no-unused-state](docs/rules/no-unused-state.md)                                             | Disallow definitions of unused state                                                                                                         |    |    |    |    |    |
+| [no-will-update-set-state](docs/rules/no-will-update-set-state.md)                           | Disallow usage of setState in componentWillUpdate                                                                                            |    |    |    |    |    |
+| [prefer-es6-class](docs/rules/prefer-es6-class.md)                                           | Enforce ES5 or ES6 class for React Components                                                                                                |    |    |    |    |    |
+| [prefer-exact-props](docs/rules/prefer-exact-props.md)                                       | Prefer exact proptype definitions                                                                                                            |    |    |    |    |    |
+| [prefer-read-only-props](docs/rules/prefer-read-only-props.md)                               | Enforce that props are read-only                                                                                                             |    |    | 🔧 |    |    |
+| [prefer-stateless-function](docs/rules/prefer-stateless-function.md)                         | Enforce stateless components to be written as a pure function                                                                                |    |    |    |    |    |
+| [prop-types](docs/rules/prop-types.md)                                                       | Disallow missing props validation in a React component definition                                                                            | ☑️ |    |    |    |    |
+| [react-in-jsx-scope](docs/rules/react-in-jsx-scope.md)                                       | Disallow missing React when using JSX                                                                                                        | ☑️ | 🏃 |    |    |    |
+| [require-default-props](docs/rules/require-default-props.md)                                 | Enforce a defaultProps definition for every prop that is not a required prop                                                                 |    |    |    |    |    |
+| [require-optimization](docs/rules/require-optimization.md)                                   | Enforce React components to have a shouldComponentUpdate method                                                                              |    |    |    |    |    |
+| [require-render-return](docs/rules/require-render-return.md)                                 | Enforce ES5 or ES6 class for returning value in render function                                                                              | ☑️ |    |    |    |    |
+| [self-closing-comp](docs/rules/self-closing-comp.md)                                         | Disallow extra closing tags for components without children                                                                                  |    |    | 🔧 |    |    |
+| [sort-comp](docs/rules/sort-comp.md)                                                         | Enforce component methods order                                                                                                              |    |    |    |    |    |
+| [sort-default-props](docs/rules/sort-default-props.md)                                       | Enforce defaultProps declarations alphabetical sorting                                                                                       |    |    |    |    |    |
+| [sort-prop-types](docs/rules/sort-prop-types.md)                                             | Enforce propTypes declarations alphabetical sorting                                                                                          |    |    | 🔧 |    |    |
+| [state-in-constructor](docs/rules/state-in-constructor.md)                                   | Enforce class component state initialization style                                                                                           |    |    |    |    |    |
+| [static-property-placement](docs/rules/static-property-placement.md)                         | Enforces where React component static properties should be positioned.                                                                       |    |    |    |    |    |
+| [style-prop-object](docs/rules/style-prop-object.md)                                         | Enforce style prop value is an object                                                                                                        |    |    |    |    |    |
+| [void-dom-elements-no-children](docs/rules/void-dom-elements-no-children.md)                 | Disallow void DOM elements (e.g. `<img />`, `<br />`) from receiving children                                                                |    |    |    |    |    |
+
+<!-- end auto-generated rules list -->
+
+## Other useful plugins
+
+- Rules of Hooks: [eslint-plugin-react-hooks](https://github.com/facebook/react/tree/master/packages/eslint-plugin-react-hooks)
+- JSX accessibility: [eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y)
+- React Native: [eslint-plugin-react-native](https://github.com/Intellicode/eslint-plugin-react-native)
 
 ## License
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Feslint%2Feslint.svg?type=large)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Feslint%2Feslint?ref=badge_large)
+`eslint-plugin-react` is licensed under the [MIT License](https://opensource.org/licenses/mit-license.php).
 
-## Team
+[npm-url]: https://npmjs.org/package/eslint-plugin-react
+[npm-image]: https://img.shields.io/npm/v/eslint-plugin-react.svg
 
-These folks keep the project moving and are resources for help.
+[status-url]: https://github.com/jsx-eslint/eslint-plugin-react/pulse
+[status-image]: https://img.shields.io/github/last-commit/jsx-eslint/eslint-plugin-react.svg
 
-<!-- NOTE: This section is autogenerated. Do not manually edit.-->
+[tidelift-url]: https://tidelift.com/subscription/pkg/npm-eslint-plugin-react?utm_source=npm-eslint-plugin-react&utm_medium=referral&utm_campaign=readme
+[tidelift-image]: https://tidelift.com/badges/package/npm/eslint-plugin-react?style=flat
 
-<!--teamstart-->
+[package-url]: https://npmjs.org/package/eslint-plugin-react
+[npm-version-svg]: https://versionbadg.es/jsx-eslint/eslint-plugin-react.svg
 
-### Technical Steering Committee (TSC)
-
-The people who manage releases, review feature requests, and meet regularly to ensure ESLint is properly maintained.
-
-<table><tbody><tr><td align="center" valign="top" width="11%">
-<a href="https://github.com/nzakas">
-<img src="https://github.com/nzakas.png?s=75" width="75" height="75" alt="Nicholas C. Zakas's Avatar"><br />
-Nicholas C. Zakas
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/mdjermanovic">
-<img src="https://github.com/mdjermanovic.png?s=75" width="75" height="75" alt="Milos Djermanovic's Avatar"><br />
-Milos Djermanovic
-</a>
-</td></tr></tbody></table>
-
-### Reviewers
-
-The people who review and implement new features.
-
-<table><tbody><tr><td align="center" valign="top" width="11%">
-<a href="https://github.com/aladdin-add">
-<img src="https://github.com/aladdin-add.png?s=75" width="75" height="75" alt="唯然's Avatar"><br />
-唯然
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/snitin315">
-<img src="https://github.com/snitin315.png?s=75" width="75" height="75" alt="Nitin Kumar's Avatar"><br />
-Nitin Kumar
-</a>
-</td></tr></tbody></table>
-
-### Committers
-
-The people who review and fix bugs and help triage issues.
-
-<table><tbody><tr><td align="center" valign="top" width="11%">
-<a href="https://github.com/bmish">
-<img src="https://github.com/bmish.png?s=75" width="75" height="75" alt="Bryan Mishkin's Avatar"><br />
-Bryan Mishkin
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/fasttime">
-<img src="https://github.com/fasttime.png?s=75" width="75" height="75" alt="Francesco Trotta's Avatar"><br />
-Francesco Trotta
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/ota-meshi">
-<img src="https://github.com/ota-meshi.png?s=75" width="75" height="75" alt="Yosuke Ota's Avatar"><br />
-Yosuke Ota
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/Tanujkanti4441">
-<img src="https://github.com/Tanujkanti4441.png?s=75" width="75" height="75" alt="Tanuj Kanti's Avatar"><br />
-Tanuj Kanti
-</a>
-</td></tr></tbody></table>
-
-### Website Team
-
-Team members who focus specifically on eslint.org
-
-<table><tbody><tr><td align="center" valign="top" width="11%">
-<a href="https://github.com/amareshsm">
-<img src="https://github.com/amareshsm.png?s=75" width="75" height="75" alt="Amaresh  S M's Avatar"><br />
-Amaresh  S M
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/harish-sethuraman">
-<img src="https://github.com/harish-sethuraman.png?s=75" width="75" height="75" alt="Strek's Avatar"><br />
-Strek
-</a>
-</td><td align="center" valign="top" width="11%">
-<a href="https://github.com/kecrily">
-<img src="https://github.com/kecrily.png?s=75" width="75" height="75" alt="Percy Ma's Avatar"><br />
-Percy Ma
-</a>
-</td></tr></tbody></table>
-
-<!--teamend-->
-
-## Sponsors
-
-The following companies, organizations, and individuals support ESLint's ongoing maintenance and development. [Become a Sponsor](https://opencollective.com/eslint) to get your logo on our README and website.
-
-<!-- NOTE: This section is autogenerated. Do not manually edit.-->
-<!--sponsorsstart-->
-<h3>Platinum Sponsors</h3>
-<p><a href="#"><img src="https://images.opencollective.com/2021-frameworks-fund/logo.png" alt="Chrome Frameworks Fund" height="undefined"></a> <a href="https://automattic.com"><img src="https://images.opencollective.com/automattic/d0ef3e1/logo.png" alt="Automattic" height="undefined"></a></p><h3>Gold Sponsors</h3>
-<p><a href="https://engineering.salesforce.com"><img src="https://images.opencollective.com/salesforce/ca8f997/logo.png" alt="Salesforce" height="96"></a> <a href="https://www.airbnb.com/"><img src="https://images.opencollective.com/airbnb/d327d66/logo.png" alt="Airbnb" height="96"></a></p><h3>Silver Sponsors</h3>
-<p><a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/5c4fa84/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301?v=4" alt="American Express" height="64"></a> <a href="https://www.workleap.com"><img src="https://avatars.githubusercontent.com/u/53535748?u=d1e55d7661d724bf2281c1bfd33cb8f99fe2465f&v=4" alt="Workleap" height="64"></a></p><h3>Bronze Sponsors</h3>
-<p><a href="https://themeisle.com"><img src="https://images.opencollective.com/themeisle/d5592fe/logo.png" alt="ThemeIsle" height="32"></a> <a href="https://www.crosswordsolver.org/anagram-solver/"><img src="https://images.opencollective.com/anagram-solver/2666271/logo.png" alt="Anagram Solver" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://transloadit.com/"><img src="https://avatars.githubusercontent.com/u/125754?v=4" alt="Transloadit" height="32"></a> <a href="https://www.ignitionapp.com"><img src="https://avatars.githubusercontent.com/u/5753491?v=4" alt="Ignition" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104?v=4" alt="Nx" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774?v=4" alt="HeroCoders" height="32"></a></p>
-<!--sponsorsend-->
-
-## Technology Sponsors
-
-* Site search ([eslint.org](https://eslint.org)) is sponsored by [Algolia](https://www.algolia.com)
-* Hosting for ([eslint.org](https://eslint.org)) is sponsored by [Netlify](https://www.netlify.com)
-* Password management is sponsored by [1Password](https://www.1password.com)
+[actions-image]: https://img.shields.io/endpoint?url=https://github-actions-badge-u3jn4tfpocch.runkit.sh/jsx-eslint/eslint-plugin-react
+[actions-url]: https://github.com/jsx-eslint/eslint-plugin-react/actions
