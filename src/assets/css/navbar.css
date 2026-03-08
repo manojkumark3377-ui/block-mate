@@ -1,0 +1,152 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1.5rem;
+    background-color: rgb(12, 18, 36);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin: 1.5rem 2rem;
+    color: rgba(255, 246, 246, 0.719);
+    height: 70px;
+    position: relative;
+    z-index: 1000;
+}
+
+.nav-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: rgba(255, 246, 246, 0.637);
+}
+
+.nav-logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.nav-brand-text {
+    font-weight: 1000;
+    color: rgba(255, 246, 246, 0.637);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.user-profile-link {
+    font-weight: 600;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    background: rgba(247, 252, 253, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+}
+
+.logout-button-nav {
+    margin-left: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.logout-button-nav:hover {
+    background: rgba(255, 80, 80, 0.2);
+    color: #fff;
+}
+
+/* Mobile Toggle */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 992px) {
+    .navbar {
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        margin: 0.5rem;
+        height: auto;
+        min-height: 60px;
+        padding: 0.75rem 1rem;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-right {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: rgb(12, 18, 36);
+        padding: 1rem;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        gap: 0.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-right.active {
+        display: flex;
+    }
+
+    .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+    }
+
+    .user-profile-link {
+        justify-content: center;
+    }
+
+    .logout-button-nav {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}

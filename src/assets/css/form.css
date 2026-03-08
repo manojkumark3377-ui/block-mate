@@ -1,0 +1,164 @@
+.form-container {
+    max-width: 500px;
+    width: 90%;
+    margin: 2rem auto;
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0px 5px 10px 5px rgb(105, 105, 107);
+}
+
+
+.inner-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: black;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    color: var(--text-muted)
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+}
+
+.form-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.brand {
+    font-size: 2.1em;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+    color: #403301;
+}
+
+.forgot-password {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    text-align: right;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+span {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+span a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+span a:hover {
+    text-decoration: underline;
+}
+
+.formm-title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: rgba(200, 198, 198, 0.933);
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+
+    .form-logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .brand {
+        font-size: 1.7em;
+    }
+
+    .form-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        width: 95%;
+        padding: 1rem;
+    }
+}
