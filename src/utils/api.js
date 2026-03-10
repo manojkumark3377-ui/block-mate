@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-export const baseURL = import.meta.env.VITE_API_URL || 'https://blockmate.onrender.com/api/v1';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+export const baseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8000/api/v1' : 'https://blockmate.onrender.com/api/v1');
 
 const api = axios.create({
     baseURL: baseURL,
-    withCredentials: true
+    withCredentials: true,
+    timeout: 10000 // 10 second timeout to prevent "stuck" buttons
 });
 
 // Smart Interceptor to help the user "fix it"
@@ -12,14 +14,20 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         const isLocalhostFallback = baseURL.includes('localhost');
-        const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+        const isProduction = !isLocalhost;
 
         if (!error.response && isLocalhostFallback && isProduction) {
             console.error("BLOCKMATE DEPLOYMENT ERROR: Your frontend is live but trying to talk to localhost.");
-            error.message = "Network Error: Application misconfigured. Reverting to smart fallback...";
+            error.message = "Network Error: Application misconfigured. Check VITE_API_URL.";
         }
+
+        if (error.code === 'ECONNABORTED') {
+            error.message = "Request timed out. Please check if the server is running.";
+        }
+
         return Promise.reject(error);
     }
 );
 
 export default api;
+

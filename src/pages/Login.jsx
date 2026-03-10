@@ -56,7 +56,7 @@ const Login = () => {
           console.warn('Failed to write blogData to localStorage', e);
         }
         navigate("/home");
-        toast.success(data.message || "Details Saved", {
+        toast.success(`Welcome back, ${data.user?.name || data.user?.username || "Login Successful"}!`, {
           position: "top-right",
           autoClose: 3000
         });
@@ -84,7 +84,7 @@ const Login = () => {
     <div className="form-container">
       <form className="inner-container" onSubmit={handleSubmit}>
         <div className="form-header">
-          <img src={logo} alt="Venzenth Logo" className="form-logo" />
+          <img src={logo} alt="BløckMate Logo" className="form-logo" width="120" height="120" />
           <div className="header-text">
             <h1 className="brand">BløckMate</h1>
           </div>

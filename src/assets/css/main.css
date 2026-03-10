@@ -27,7 +27,8 @@ body {
 }
 
 .main-content {
-    padding: 0 2rem;
+    padding: 1.5rem 2rem;
+    min-height: calc(100vh - 200px);
 }
 
 .table-title {

@@ -94,7 +94,7 @@ const Signup = () => {
     <div className="form-container">
       <form className="inner-container" onSubmit={handleSubmit}>
         <div className="form-header">
-          <img src={logo} alt="Venzenth Logo" className="form-logo" />
+          <img src={logo} alt="BløckMate Logo" className="form-logo" width="120" height="120" />
           <div className="header-text">
             <h1 className="brand">BløckMate</h1>
           </div>

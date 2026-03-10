@@ -75,7 +75,10 @@ router.post('/signup', async (req, res) => {
 // @access  Public
 router.post('/forgot-password', async (req, res) => {
     try {
-        const { email } = req.body;
+        const email = req.body.email?.toLowerCase().trim();
+        if (!email) {
+            return res.status(400).json({ message: 'Please provide an email' });
+        }
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -84,19 +87,35 @@ router.post('/forgot-password', async (req, res) => {
 
         // Generate OTP and hash it before storing
         const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+        // Log OTP in development for easier testing
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`[DEV] OTP for ${email}: ${otp}`);
+        }
+
         user.resetPasswordOTP = hashOtp(otp);
         user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
         await user.save();
 
         // Send OTP via email
-        await createTransporter().sendMail({
-            from: process.env.MAIL_USER,
-            to: email,
-            subject: 'BløckMate - Password Reset OTP',
-            text: `Your OTP is ${otp}. It expires in 10 minutes. Do not share it with anyone.`,
-        });
-
-        res.json({ message: 'OTP sent to registered email' });
+        try {
+            await createTransporter().sendMail({
+                from: process.env.MAIL_USER,
+                to: email,
+                subject: 'BløckMate - Password Reset OTP',
+                text: `Your OTP is ${otp}. It expires in 10 minutes. Do not share it with anyone.`,
+            });
+            res.json({ message: 'OTP sent to registered email' });
+        } catch (mailError) {
+            console.error('Mail sending failed:', mailError);
+            if (process.env.NODE_ENV !== 'production') {
+                return res.json({
+                    message: 'OTP generated (Check console as Mail failed in Dev)',
+                    dev: true
+                });
+            }
+            throw mailError;
+        }
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({ message: error.message });
@@ -108,7 +127,12 @@ router.post('/forgot-password', async (req, res) => {
 // @access  Public
 router.post('/reset-password', async (req, res) => {
     try {
-        const { email, otp, newPassword } = req.body;
+        const { otp, newPassword } = req.body;
+        const email = req.body.email?.toLowerCase().trim();
+
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ message: 'Please provide email, otp and new password' });
+        }
 
         // Compare hashed OTP
         const user = await User.findOne({
