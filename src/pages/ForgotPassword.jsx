@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import logo from "../assets/images/logoo.jpeg";
 
@@ -21,7 +21,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("/api/v1/auth/forgot-password", { email });
+      const response = await api.post("/auth/forgot-password", { email });
       toast.success(response.data.message);
       setOtpSent(true);
     } catch (err) {
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("/api/v1/auth/reset-password", {
+      const response = await api.post("/auth/reset-password", {
         email,
         otp,
         newPassword,

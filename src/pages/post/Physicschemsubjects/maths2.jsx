@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CategoryList from "../../category/CategoryList";
 import NewCategory from "../../category/NewCategory";
 import UpdateCategory from "../../category/UpdateCategory";
-import axios from "axios";
+import api from "../../../utils/api";
 import { toast } from "react-toastify";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import FileSection from "../../components/FileSection";
@@ -24,7 +24,7 @@ const Maths2 = () => {
 
     const fetchModules = async (subjId) => {
         try {
-            const modRes = await axios.get(`http://localhost:8000/api/v1/modules?subjectId=${subjId}`);
+            const modRes = await api.get(`/modules?subjectId=${subjId}`);
             setModules(modRes.data);
         } catch (error) {
             toast.error("Failed to fetch modules");
@@ -34,7 +34,7 @@ const Maths2 = () => {
     useEffect(() => {
         const fetchSubjectAndModules = async () => {
             try {
-                const subRes = await axios.get(`http://localhost:8000/api/v1/subjects?title=${encodeURIComponent(subjectTitle)}`);
+                const subRes = await api.get(`/subjects?title=${encodeURIComponent(subjectTitle)}`);
                 if (subRes.data.length > 0) {
                     const sub = subRes.data[0];
                     setSubjectData(sub);
@@ -52,7 +52,7 @@ const Maths2 = () => {
         if (!title || !subjectData) return;
 
         try {
-            await axios.post("http://localhost:8000/api/v1/modules", {
+            await api.post("/modules", {
                 title,
                 subject: subjectData._id,
                 order: modules.length + 1
@@ -69,7 +69,7 @@ const Maths2 = () => {
         if (!window.confirm("Are you sure? This will delete all questions inside this module!")) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/v1/modules/${moduleId}`);
+            await api.delete(`/modules/${moduleId}`);
             toast.success("Module deleted");
             fetchModules(subjectData._id);
         } catch (error) {
@@ -154,24 +154,24 @@ const Maths2 = () => {
                             {isAdmin && (
 
 
-                            <button
-                                onClick={(e) => handleDeleteModule(e, module._id)}
-                                style={{
-                                    position: "absolute",
-                                    top: "10px",
-                                    right: "10px",
-                                    background: "rgba(255, 0, 0, 0.1)",
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    padding: "5px",
-                                    cursor: "pointer",
-                                    color: "#ff4444",
-                                    zIndex: 10
-                                }}
-                                title="Delete Module"
-                            >
-                                <FaTrash />
-                            </button>
+                                <button
+                                    onClick={(e) => handleDeleteModule(e, module._id)}
+                                    style={{
+                                        position: "absolute",
+                                        top: "10px",
+                                        right: "10px",
+                                        background: "rgba(255, 0, 0, 0.1)",
+                                        border: "none",
+                                        borderRadius: "4px",
+                                        padding: "5px",
+                                        cursor: "pointer",
+                                        color: "#ff4444",
+                                        zIndex: 10
+                                    }}
+                                    title="Delete Module"
+                                >
+                                    <FaTrash />
+                                </button>
 
 
                             )}
@@ -192,7 +192,7 @@ const Maths2 = () => {
                         files={subjectData.files}
                         onFileChange={() => {
                             const fetchSubjectAgain = async () => {
-                                const subRes = await axios.get(`http://localhost:8000/api/v1/subjects?title=${encodeURIComponent(subjectTitle)}`);
+                                const subRes = await api.get(`/subjects?title=${encodeURIComponent(subjectTitle)}`);
                                 if (subRes.data.length > 0) {
                                     setSubjectData(subRes.data[0]);
                                 }

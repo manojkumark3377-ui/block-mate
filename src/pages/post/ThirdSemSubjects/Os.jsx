@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CategoryList from "../../category/CategoryList";
 import NewCategory from "../../category/NewCategory";
 import UpdateCategory from "../../category/UpdateCategory";
-import axios from "axios";
+import api from "../../../utils/api";
 import { toast } from "react-toastify";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import FileSection from "../../components/FileSection";
@@ -24,7 +24,7 @@ const Os = () => {
 
     const fetchModules = async (subjId) => {
         try {
-            const modRes = await axios.get(`http://localhost:8000/api/v1/modules?subjectId=${subjId}`);
+            const modRes = await api.get(`/modules?subjectId=${subjId}`);
             setModules(modRes.data);
         } catch (error) {
             toast.error("Failed to fetch modules");
@@ -34,7 +34,7 @@ const Os = () => {
     useEffect(() => {
         const fetchSubjectAndModules = async () => {
             try {
-                const subRes = await axios.get(`http://localhost:8000/api/v1/subjects?title=${encodeURIComponent(subjectTitle)}`);
+                const subRes = await api.get(`/subjects?title=${encodeURIComponent(subjectTitle)}`);
                 if (subRes.data.length > 0) {
                     const sub = subRes.data[0];
                     setSubjectData(sub);
@@ -52,7 +52,7 @@ const Os = () => {
         if (!title || !subjectData) return;
 
         try {
-            await axios.post("http://localhost:8000/api/v1/modules", {
+            await api.post("/modules", {
                 title,
                 subject: subjectData._id,
                 order: modules.length + 1
@@ -69,7 +69,7 @@ const Os = () => {
         if (!window.confirm("Are you sure? This will delete all questions inside this module!")) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/v1/modules/${moduleId}`);
+            await api.delete(`/modules/${moduleId}`);
             toast.success("Module deleted");
             fetchModules(subjectData._id);
         } catch (error) {
@@ -191,7 +191,7 @@ const Os = () => {
                         files={subjectData.files}
                         onFileChange={() => {
                             const fetchSubjectAgain = async () => {
-                                const subRes = await axios.get(`http://localhost:8000/api/v1/subjects?title=${encodeURIComponent(subjectTitle)}`);
+                                const subRes = await api.get(`/subjects?title=${encodeURIComponent(subjectTitle)}`);
                                 if (subRes.data.length > 0) {
                                     setSubjectData(subRes.data[0]);
                                 }

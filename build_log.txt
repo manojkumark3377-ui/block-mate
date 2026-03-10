@@ -1,0 +1,27 @@
+
+> blockmate@0.0.0 build
+> vite build
+
+vite v4.5.14 building for production...
+transforming...
+✓ 135 modules transformed.
+✓ built in 622ms
+"baseURL" is not exported by "src/utils/api.js", imported by "src/components/FileSection.jsx".
+file: /Users/manojkumark/Documents/BlockMate/src/components/FileSection.jsx:2:14
+1: import React, { useState } from 'react';
+2: import api, { baseURL } from '../utils/api';
+                 ^
+3: import { toast } from 'react-toastify';
+4: import { FaUpload, FaDownload, FaTrash, FaFileAlt, FaFilePdf, FaFileWord, FaFileImage, FaFolderOpen, FaTimes, FaLink ...
+error during build:
+RollupError: "baseURL" is not exported by "src/utils/api.js", imported by "src/components/FileSection.jsx".
+    at error (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:2287:30)
+    at Module.error (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:13745:16)
+    at Module.traceVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:14175:29)
+    at ModuleScope.findVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:12615:39)
+    at ReturnValueScope.findVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:7124:38)
+    at ChildScope.findVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:7124:38)
+    at ReturnValueScope.findVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:7124:38)
+    at ChildScope.findVariable (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:7124:38)
+    at MemberExpression.bind (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:9539:49)
+    at CallExpression.bind (file:///Users/manojkumark/Documents/BlockMate/node_modules/rollup/dist/es/shared/node-entry.js:5892:23)

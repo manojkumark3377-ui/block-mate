@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/images/logoo.jpeg";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 
 const Profile = () => {
@@ -26,7 +26,7 @@ const Profile = () => {
         const token = parsed.token;
 
         if (token) {
-          const response = await axios.get("/api/v1/auth/profile", {
+          const response = await api.get("/auth/profile", {
             headers: { Authorization: `Bearer ${token}` }
           });
 
@@ -97,7 +97,7 @@ const Profile = () => {
         delete updatePayload.password;
       }
 
-      const response = await axios.put("/api/v1/auth/profile", updatePayload, {
+      const response = await api.put("/auth/profile", updatePayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

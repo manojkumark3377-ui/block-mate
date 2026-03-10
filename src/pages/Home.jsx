@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Home = () => {
   const fetchGlobalResults = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:8000/api/v1/categories?search=${search}`);
+      const res = await api.get(`/categories?search=${search}`);
       setGlobalResults(res.data);
     } catch (error) {
       console.error("Failed to fetch global search results", error);

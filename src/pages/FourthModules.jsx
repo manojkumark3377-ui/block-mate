@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
 const FourthModules = () => {
   const navigate = useNavigate();
-    const authData = JSON.parse(localStorage.getItem('blogData') || '{}');
-    const isAdmin = authData?.role === 'admin';
+  const authData = JSON.parse(localStorage.getItem('blogData') || '{}');
+  const isAdmin = authData?.role === 'admin';
 
 
   const [subjects, setSubjects] = useState([]);
@@ -18,7 +18,7 @@ const FourthModules = () => {
   const fetchSubjects = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:8000/api/v1/subjects?semester=${encodeURIComponent(semesterName)}`);
+      const res = await api.get(`/subjects?semester=${encodeURIComponent(semesterName)}`);
       setSubjects(res.data);
     } catch (error) {
       toast.error("Failed to fetch subjects");
@@ -36,7 +36,7 @@ const FourthModules = () => {
     if (!title) return;
 
     try {
-      await axios.post("http://localhost:8000/api/v1/subjects", {
+      await api.post("/subjects", {
         title,
         semester: semesterName,
         order: subjects.length + 1
@@ -53,7 +53,7 @@ const FourthModules = () => {
     if (!window.confirm("Are you sure? This will delete the subject and ALL its modules/questions!")) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/v1/subjects/${id}`);
+      await api.delete(`/subjects/${id}`);
       toast.success("Subject deleted");
       fetchSubjects();
     } catch (error) {
@@ -107,23 +107,23 @@ const FourthModules = () => {
                 </button>
                 {isAdmin && (
 
-                <button
-                  onClick={(e) => handleDeleteSubject(e, sub._id)}
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    background: "rgba(255, 0, 0, 0.1)",
-                    border: "none",
-                    borderRadius: "4px",
-                    padding: "5px",
-                    cursor: "pointer",
-                    color: "#ff4444"
-                  }}
-                  title="Delete Subject"
-                >
-                  <FaTrash />
-                </button>
+                  <button
+                    onClick={(e) => handleDeleteSubject(e, sub._id)}
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "rgba(255, 0, 0, 0.1)",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "5px",
+                      cursor: "pointer",
+                      color: "#ff4444"
+                    }}
+                    title="Delete Subject"
+                  >
+                    <FaTrash />
+                  </button>
 
                 )}
               </div>
@@ -134,7 +134,7 @@ const FourthModules = () => {
         </div>
       )}
 
-      
+
     </div>
   );
 };

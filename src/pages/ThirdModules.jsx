@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
@@ -18,7 +18,7 @@ const ThirdModules = () => {
   const fetchSubjects = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:8000/api/v1/subjects?semester=${encodeURIComponent(semesterName)}`);
+      const res = await api.get(`/subjects?semester=${encodeURIComponent(semesterName)}`);
       setSubjects(res.data);
     } catch (error) {
       toast.error("Failed to fetch subjects");
@@ -36,7 +36,7 @@ const ThirdModules = () => {
     if (!title) return;
 
     try {
-      await axios.post("http://localhost:8000/api/v1/subjects", {
+      await api.post("/subjects", {
         title,
         semester: semesterName,
         order: subjects.length + 1
@@ -53,7 +53,7 @@ const ThirdModules = () => {
     if (!window.confirm("Are you sure? This will delete the subject and ALL its modules/questions!")) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/v1/subjects/${id}`);
+      await api.delete(`/subjects/${id}`);
       toast.success("Subject deleted");
       fetchSubjects();
     } catch (error) {

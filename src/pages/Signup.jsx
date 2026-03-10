@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import signupValidator from "../validators/signupvalidator";
 import logo from "../assets/images/logoo.jpeg";
-import axios from "axios";
+import api from "../utils/api";
 const initialFormData = {
   name: "",
   dob: "",
@@ -58,7 +58,7 @@ const Signup = () => {
           email: formData.email,
           password: formData.password,
         }
-        const response = await axios.post("/api/v1/auth/signup", requestBody);
+        const response = await api.post("/auth/signup", requestBody);
         const data = response.data;
         // persist returned auth data (token + user fields) so app can use it
         try {

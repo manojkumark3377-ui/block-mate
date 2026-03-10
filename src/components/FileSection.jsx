@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api, { baseURL } from '../utils/api';
 import { toast } from 'react-toastify';
 import { FaUpload, FaDownload, FaTrash, FaFileAlt, FaFilePdf, FaFileWord, FaFileImage, FaFolderOpen, FaTimes, FaLink } from 'react-icons/fa';
 
@@ -20,7 +20,7 @@ const FileSection = ({ type, id, files, onFileChange, isAdmin }) => {
 
         setUploading(true);
         try {
-            await axios.post(`http://localhost:8000/api/v1/upload/${type}/${id}`, formData, {
+            await api.post(`/upload/${type}/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             toast.success("File uploaded successfully");
@@ -47,7 +47,7 @@ const FileSection = ({ type, id, files, onFileChange, isAdmin }) => {
 
         setUploading(true);
         try {
-            await axios.post(`http://localhost:8000/api/v1/upload/link/${type}/${id}`, {
+            await api.post(`/upload/link/${type}/${id}`, {
                 name: fileName,
                 url: finalUrl
             });
@@ -67,7 +67,7 @@ const FileSection = ({ type, id, files, onFileChange, isAdmin }) => {
         if (!window.confirm("Are you sure you want to delete this?")) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/v1/upload/${type}/${id}/${fileId}`);
+            await api.delete(`/upload/${type}/${id}/${fileId}`);
             toast.success("Deleted successfully");
             onFileChange();
         } catch (error) {
@@ -256,7 +256,7 @@ const FileSection = ({ type, id, files, onFileChange, isAdmin }) => {
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <a
-                                        href={isExternalLink ? file.url : `http://localhost:8000${file.url}`}
+                                        href={isExternalLink ? file.url : `${baseURL.replace('/api/v1', '')}${file.url}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         title={isExternalLink ? "Open Link" : "Download"}

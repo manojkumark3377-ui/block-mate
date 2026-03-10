@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/images/logoo.jpeg";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 
 const Setting = () => {
@@ -39,7 +39,7 @@ const Setting = () => {
       }
       const token = JSON.parse(raw).token;
 
-      await axios.put("/api/v1/auth/change-password", {
+      await api.put("/auth/change-password", {
         oldPassword: passwords.oldPassword,
         newPassword: passwords.newPassword,
       }, {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/api";
 import { toast } from "react-toastify";
 
 const UpdateCategory = ({ categoryId, onBack }) => {
@@ -14,7 +14,7 @@ const UpdateCategory = ({ categoryId, onBack }) => {
     if (!id) return;
     const fetchCategory = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/v1/categories/${id}`);
+        const res = await api.get(`/categories/${id}`);
         setFormData({
           title: res.data.title,
           desc: res.data.desc || ""
@@ -38,7 +38,7 @@ const UpdateCategory = ({ categoryId, onBack }) => {
     }
     setLoading(true);
     try {
-      await axios.put(`http://localhost:8000/api/v1/categories/${id}`, formData);
+      await api.put(`/categories/${id}`, formData);
       toast.success("Question updated successfully");
       if (onBack) {
         onBack();

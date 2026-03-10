@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/api";
 import { toast } from "react-toastify";
 import FileSection from "../../components/FileSection";
 
@@ -161,7 +161,7 @@ const CategoryList = ({ subjectId, moduleId, subjectTitle, onClose, onAdd, onUpd
 
   const fetchModuleData = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/v1/modules/${moduleId}`);
+      const res = await api.get(`/modules/${moduleId}`);
       setModuleData(res.data);
     } catch (error) {
       console.error("Failed to fetch module details", error);
@@ -176,7 +176,7 @@ const CategoryList = ({ subjectId, moduleId, subjectTitle, onClose, onAdd, onUpd
       if (subjectId) params.subjectId = subjectId;
       if (moduleId) params.moduleId = moduleId;
 
-      const res = await axios.get("http://localhost:8000/api/v1/categories", { params });
+      const res = await api.get("/categories", { params });
       setCategories(res.data);
     } catch (error) {
       toast.error("Failed to fetch questions");
@@ -188,7 +188,7 @@ const CategoryList = ({ subjectId, moduleId, subjectTitle, onClose, onAdd, onUpd
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/v1/categories/${id}`);
+        await api.delete(`/categories/${id}`);
         toast.success("Question deleted");
         fetchCategories();
       } catch (error) {

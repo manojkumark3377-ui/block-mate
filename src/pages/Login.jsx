@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import loginValidator from "../validators/loginvalidator";
 import logo from "../assets/images/logoo.jpeg";
-import axios from "axios";
+import api from "../utils/api";
 
 const initialFormData = {
   email: "",
@@ -46,7 +46,7 @@ const Login = () => {
           email: formData.email,
           password: formData.password,
         };
-        const response = await axios.post("/api/v1/auth/login", requestBody);
+        const response = await api.post("/auth/login", requestBody);
         const data = response.data;
 
         // persist returned auth data (token + user fields)

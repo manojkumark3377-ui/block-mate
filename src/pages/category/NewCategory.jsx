@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/api";
 import { toast } from "react-toastify";
 
 const NewCategory = ({ subjectId, moduleId, subjectTitle, onBack }) => {
@@ -20,7 +20,7 @@ const NewCategory = ({ subjectId, moduleId, subjectTitle, onBack }) => {
     }
     setLoading(true);
     try {
-      await axios.post("http://localhost:8000/api/v1/categories", formData);
+      await api.post("/categories", formData);
       toast.success("Question added successfully");
       if (onBack) {
         onBack();

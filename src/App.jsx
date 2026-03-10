@@ -9,10 +9,6 @@ import Profile from "./pages/Profile";
 import Setting from "./pages/Setting";
 import Contact from "./pages/Contact";
 import CategoryList from "./pages/category/CategoryList";
-import PostList from "./pages/post/PostList";
-import NewPost from "./pages/post/NewPost";
-import DetailPost from "./pages/post/DetailPost";
-import UpdatePost from "./pages/post/UpdatePost";
 import NewCategory from "./pages/category/NewCategory";
 import UpdateCategory from "./pages/category/UpdateCategory";
 import CycleSubjects from "./pages/firstyear";
@@ -51,10 +47,6 @@ function App() {
             <Route path="/SeventhModules" element={<SeventhModules />} />
             <Route path="/EighthModules" element={<EighthModules />} />
             <Route path="/categories" element={<CategoryList />} />
-            <Route path="/posts" element={<PostList />} />
-            <Route path="/posts/new" element={<NewPost />} />
-            <Route path="/posts/detail/:id" element={<DetailPost />} />
-            <Route path="/posts/update/:id" element={<UpdatePost />} />
             <Route path="/categories/new" element={<NewCategory />} />
             <Route path="/categories/update/:id" element={<UpdateCategory />} />
             <Route path="/subject/:title" element={<SubjectDetail />} />
