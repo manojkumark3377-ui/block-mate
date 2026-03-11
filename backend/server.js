@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 8000;
 const allowedOrigins = [
     process.env.FRONTEND_URL,
     "https://vtublockmate.netlify.app",
-    "https://blockmate.netlify.app",
     "http://localhost:3000",
     "http://localhost:5173"
 ].filter(Boolean).map(origin => origin.replace(/\/$/, "")); // Remove trailing slashes

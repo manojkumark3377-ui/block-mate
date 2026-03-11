@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-export const baseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8000/api/v1' : 'https://blockmate.onrender.com/api/v1');
+export const baseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8000/api/v1' : 'https://block-mate-tau.vercel.app/api/v1');
 
 const api = axios.create({
     baseURL: baseURL,
