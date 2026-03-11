@@ -6,14 +6,16 @@ const fs = require('fs');
 const Subject = require('../models/Subject');
 const Module = require('../models/Module');
 
-// Configure multer storage
+// Configure multer storage - Use /tmp in serverless environments
+const isServerless = process.env.VERCEL || process.env.SERVERLESS;
+const uploadBaseDir = isServerless ? path.join('/tmp', 'uploads') : path.join(__dirname, '../uploads/');
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, '../uploads/');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
+        if (!fs.existsSync(uploadBaseDir)) {
+            fs.mkdirSync(uploadBaseDir, { recursive: true });
         }
-        cb(null, uploadDir);
+        cb(null, uploadBaseDir);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
@@ -129,7 +131,8 @@ router.delete('/subject/:id/:fileId', async (req, res) => {
 
         // Delete from filesystem only if it's an uploaded file
         if (file.url && file.url.startsWith('/uploads/')) {
-            const filePath = path.join(__dirname, '..', file.url);
+            const fileName = path.basename(file.url);
+            const filePath = path.join(uploadBaseDir, fileName);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
@@ -155,7 +158,8 @@ router.delete('/module/:id/:fileId', async (req, res) => {
 
         // Delete from filesystem only if it's an uploaded file
         if (file.url && file.url.startsWith('/uploads/')) {
-            const filePath = path.join(__dirname, '..', file.url);
+            const fileName = path.basename(file.url);
+            const filePath = path.join(uploadBaseDir, fileName);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }

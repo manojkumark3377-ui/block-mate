@@ -78,10 +78,12 @@ app.use('/api/v1/subjects', subjectRoutes);
 app.use('/api/v1/modules', moduleRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 
-// Static folder for uploads
-const uploadDir = path.join(__dirname, 'uploads');
+// Static folder for uploads - Use /tmp in serverless environments
+const isServerless = process.env.VERCEL || process.env.SERVERLESS;
+const uploadDir = isServerless ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
+
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 app.use('/uploads', express.static(uploadDir));
 
@@ -128,3 +130,6 @@ app.use((err, req, res, next) => {
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+// Export the app for Vercel
+module.exports = app;
