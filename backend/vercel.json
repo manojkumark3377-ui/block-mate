@@ -6,11 +6,6 @@
       "use": "@vercel/node"
     }
   ],
-  "complexity": 3,
-  "description": "Added vercel.json for backend deployment configuration",
-  "emptyFile": false,
-  "isArtifact": false,
-  "overwrite": true,
   "routes": [
     {
       "src": "/(.*)",
