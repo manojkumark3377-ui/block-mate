@@ -23,7 +23,7 @@ app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".netlify.app")) {
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".netlify.app") || origin.endsWith(".vercel.app")) {
             callback(null, true);
         } else {
             console.log(`CORS blocked for origin: ${origin}`);
@@ -44,25 +44,47 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
+let isConnected = false;
 const connectDB = async () => {
+    if (isConnected) return;
     try {
-        if (!process.env.MONGODB_URI) {
+        if (!process.env.MONGODB_URI && !process.env.MONGODB_URl) {
             throw new Error("MONGODB_URI is not defined in environment variables");
         }
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        const uri = process.env.MONGODB_URI || process.env.MONGODB_URl;
+        const conn = await mongoose.connect(uri.trim());
+        isConnected = true;
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`FATAL: Database connection failed! (${error.message})`);
-        console.error("TIP: If you are in production, make sure MONGODB_URI is set to your Atlas cluster URL, NOT localhost!");
-        process.exit(1);
+        if (process.env.NODE_ENV !== 'production') {
+            console.error("TIP: If you are in production, make sure MONGODB_URI is set to your Atlas cluster URL, NOT localhost!");
+        }
+        // In serverless, we don't want to exit the process, but we might want to throw
+        throw error;
     }
 };
 
-// Start Server after DB connection
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port: ${PORT}`);
+// Start Server only if NOT in a serverless environment
+if (!process.env.VERCEL && !process.env.SERVERLESS) {
+    connectDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port: ${PORT}`);
+        });
+    }).catch(err => {
+        console.error("Failed to start server:", err);
+        process.exit(1);
     });
+}
+
+// Middleware to ensure DB is connected for serverless
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "Database connection error", error: error.message });
+    }
 });
 
 const authRoutes = require('./routes/auth');
@@ -131,4 +153,25 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Export the app for Vercel
-module.exports = app;
+if (process.env.VERCEL || process.env.SERVERLESS) {
+    module.exports = app;
+}
+
+// Unified Hosting: Serve Frontend Static Files
+// This allows the backend to serve the frontend on the same port/server
+const frontendDistPath = path.join(__dirname, '../dist');
+if (fs.existsSync(frontendDistPath)) {
+    console.log(`Serving frontend from: ${frontendDistPath}`);
+    app.use(express.static(frontendDistPath));
+
+    // Handle React Router client-side routing: serve index.html for all non-API routes
+    app.get('*', (req, res, next) => {
+        // Skip API routes
+        if (req.url.startsWith('/api/v1')) {
+            return next();
+        }
+        res.sendFile(path.join(frontendDistPath, 'index.html'));
+    });
+} else {
+    console.warn("WARNING: Frontend 'dist' folder not found. Unified hosting will not serve the UI.");
+}

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-export const baseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8000/api/v1' : 'https://block-mate-tau.vercel.app/api/v1');
+// If VITE_API_URL is not set, we default to localhost in dev and a placeholder in prod
+// The user MUST set VITE_API_URL in Netlify's environment variables
+export const baseURL = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8000/api/v1' : '/api/v1');
 
 const api = axios.create({
     baseURL: baseURL,
