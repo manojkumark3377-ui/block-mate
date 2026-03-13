@@ -48,19 +48,27 @@ let isConnected = false;
 const connectDB = async () => {
     if (isConnected) return;
     try {
-        if (!process.env.MONGODB_URI && !process.env.MONGODB_URl) {
-            throw new Error("MONGODB_URI is not defined in environment variables");
+        const localUri = process.env.MONGODB_URI;
+        const atlasUri = process.env.MONGODB_ATLAS_URI;
+
+        if (!localUri && !atlasUri) {
+            throw new Error("Neither MONGODB_URI nor MONGODB_ATLAS_URI is defined in environment variables");
         }
-        const uri = process.env.MONGODB_URI || process.env.MONGODB_URl;
+
+        // Production should use Atlas, Dev can prefer Local
+        const isProd = process.env.NODE_ENV === 'production';
+        const uri = (isProd && atlasUri) ? atlasUri : (localUri || atlasUri);
+        const source = (uri === atlasUri) ? "Atlas" : "Local";
+
+        console.log(`Connecting to MongoDB... (${source})`);
         const conn = await mongoose.connect(uri.trim());
         isConnected = true;
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        console.log(`MongoDB Connected: ${conn.connection.host} (${source})`);
     } catch (error) {
         console.error(`FATAL: Database connection failed! (${error.message})`);
         if (process.env.NODE_ENV !== 'production') {
-            console.error("TIP: If you are in production, make sure MONGODB_URI is set to your Atlas cluster URL, NOT localhost!");
+            console.error("TIP: Ensure your MongoDB service is running (local) or your Atlas IP whitelist allows this connection.");
         }
-        // In serverless, we don't want to exit the process, but we might want to throw
         throw error;
     }
 };
