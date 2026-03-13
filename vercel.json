@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": "vite",
   "builds": [
     {
       "src": "backend/server.js",
@@ -8,7 +9,9 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
@@ -21,8 +24,11 @@
       "dest": "backend/server.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "src": "/(.*)",
+      "dest": "/$1"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
